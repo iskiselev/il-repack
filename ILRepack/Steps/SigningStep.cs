@@ -25,10 +25,26 @@ namespace ILRepacking.Steps
 {
     class SigningStep : IRepackStep
     {
+        public class SigningInfo
+        {
+            public SigningInfo(StrongNameKeyPair keyPair)
+            {
+                KeyPair = keyPair;
+            }
+            
+            public SigningInfo(byte[] keyBlob)
+            {
+                KeyBlob = keyBlob;
+            }
+
+            public StrongNameKeyPair KeyPair { get; private set; }
+            public byte[] KeyBlob { get; private set; }
+        }
+
         readonly IRepackContext _repackContext;
         readonly RepackOptions _repackOptions;
 
-        public StrongNameKeyPair KeyPair { get; private set; }
+        public SigningInfo KeyInfo { get; private set; }
 
         public SigningStep(
             IRepackContext repackContext,
@@ -42,34 +58,26 @@ namespace ILRepacking.Steps
         {
             if (_repackOptions.KeyContainer != null || (_repackOptions.KeyFile != null && File.Exists(_repackOptions.KeyFile)))
             {
-                var snkp = default(StrongNameKeyPair);
                 var publicKey = default(byte[]);
                 if (_repackOptions.KeyContainer != null)
                 {
-                    snkp = new StrongNameKeyPair(_repackOptions.KeyContainer);
+                    StrongNameKeyPair snkp = new StrongNameKeyPair(_repackOptions.KeyContainer);
+                    publicKey = snkp.PublicKey;
+                    if (!_repackOptions.DelaySign)
+                        KeyInfo = new SigningInfo(snkp);
                 }
                 else if(_repackOptions.KeyFile != null && File.Exists(_repackOptions.KeyFile))
                 {
                     var keyFileContents = File.ReadAllBytes(_repackOptions.KeyFile);
-                    try
+                    publicKey = CryptoService.GetPublicKey(new WriterParameters { StrongNameKeyBlob = keyFileContents });
+                    if (!_repackOptions.DelaySign)
                     {
-                        snkp = new StrongNameKeyPair(keyFileContents);
-                        publicKey = snkp.PublicKey;
-                    }
-                    catch (ArgumentException)
-                    {
-                        snkp = null;
-                        if(_repackOptions.DelaySign)
-                        {
-                            publicKey = keyFileContents;
-                        }
+                        KeyInfo = new SigningInfo(keyFileContents);
                     }
                 }
                 _repackContext.TargetAssemblyDefinition.Name.PublicKey = publicKey;
                 _repackContext.TargetAssemblyDefinition.Name.Attributes |= AssemblyAttributes.PublicKey;
                 _repackContext.TargetAssemblyMainModule.Attributes |= ModuleAttributes.StrongNameSigned;
-                if (!_repackOptions.DelaySign)
-                    KeyPair = snkp;
             }
             else
             {

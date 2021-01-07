@@ -96,6 +96,8 @@
     <Compile Include="Mixins\CollectionMixins.cs" />
     <Compile Include="PermissionsetHelper.cs" />
     <Compile Include="PlatformFixer.cs" />
+    <Compile Include="Ports\CryptoService.cs" />
+    <Compile Include="Ports\CryptoConvert.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferenceFixator.cs" />
     <Compile Include="ReflectionHelper.cs" />
@@ -181,5 +183,6 @@
   <ItemGroup>
     <EmbeddedResource Include="..\packages\SourceLink.1.1.0\tools\pdbstr.exe" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

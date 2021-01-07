@@ -344,7 +344,8 @@ namespace ILRepacking
 
                 var parameters = new WriterParameters
                 {
-                    StrongNameKeyPair = signingStep.KeyPair,
+                    StrongNameKeyPair = signingStep.KeyInfo?.KeyPair,
+                    StrongNameKeyBlob = signingStep.KeyInfo?.KeyBlob,
                     WriteSymbols = Options.DebugInfo && PrimaryAssemblyMainModule.SymbolReader != null,
                     SymbolWriterProvider = PrimaryAssemblyMainModule.SymbolReader?.GetWriterProvider(),
                 };
