@@ -1,5 +1,6 @@
 ﻿//
 // Copyright (c) 2011 Francois Valdy
+// Copyright (c) 2018 Alexander Vostres
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -356,10 +357,9 @@ namespace ILRepacking
                     Directory.CreateDirectory(outputDir);
                 }
 
-                sourceServerDataStep.Write();
-
                 Logger.Info("Writing output assembly to disk");
                 TargetAssemblyDefinition.Write(Options.OutputFile, parameters);
+                sourceServerDataStep.Write();
                 TargetAssemblyDefinition.Dispose();
                 GlobalAssemblyResolver.Dispose();
                 // If this is an executable and we are on linux/osx we should copy file permissions from
