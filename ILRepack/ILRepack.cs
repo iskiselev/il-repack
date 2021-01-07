@@ -261,6 +261,10 @@ namespace ILRepacking
             timer.Start();
             Options.Validate();
             PrintRepackHeader();
+
+            var actualOutFile = Options.OutputFile;
+            Options.OutputFile = GetTempFile(Options.OutputFile);
+
             _reflectionHelper = new ReflectionHelper(this);
             ResolveSearchDirectories();
 
@@ -338,11 +342,6 @@ namespace ILRepacking
                     step.Perform();
                 }
 
-                for (int i = 1; i < MergedAssemblies.Count; ++i)
-                {
-                    MergedAssemblies[i].Dispose();
-                }
-                
                 var parameters = new WriterParameters
                 {
                     StrongNameKeyPair = signingStep.KeyPair,
@@ -360,8 +359,18 @@ namespace ILRepacking
                 Logger.Info("Writing output assembly to disk");
                 TargetAssemblyDefinition.Write(Options.OutputFile, parameters);
                 sourceServerDataStep.Write();
+
+                for (int i = 1; i < MergedAssemblies.Count; ++i)
+                {
+                    MergedAssemblies[i].Dispose();
+                }
+
                 TargetAssemblyDefinition.Dispose();
                 GlobalAssemblyResolver.Dispose();
+
+                MoveTempFile(Options.OutputFile, actualOutFile);
+                Options.OutputFile = actualOutFile;
+
                 // If this is an executable and we are on linux/osx we should copy file permissions from
                 // the primary assembly
                 if (isUnixEnvironment)
@@ -381,6 +390,37 @@ namespace ILRepacking
             }
 
             Logger.Info($"Finished in {timer.Elapsed}");
+        }
+
+        private void MoveTempFile(string tempFile, string outFile)
+        {
+            var srcDir = Path.GetDirectoryName(tempFile);
+            var tgtDir = Path.GetDirectoryName(outFile);
+            if (!string.IsNullOrEmpty(tgtDir))
+            {
+                Directory.CreateDirectory(tgtDir);
+            }
+
+            foreach (var srcFileName in Directory.EnumerateFiles(srcDir))
+            {
+                var fileName = Path.GetFileName(srcFileName);
+                var tgtFileName = Path.Combine(tgtDir, fileName);
+                if (File.Exists(tgtFileName))
+                {
+                    File.Delete(tgtFileName);
+                }
+                File.Move(srcFileName, tgtFileName);
+            }
+
+            Directory.Delete(srcDir, false);
+        }
+
+        private string GetTempFile(string outputFileName)
+        {
+            var fileName = Path.GetFileName(outputFileName);
+            var dirName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(dirName);
+            return Path.Combine(dirName, fileName);
         }
 
         private ISourceServerDataRepackStep GetSourceServerDataStep(bool isUnixEnvironment)
