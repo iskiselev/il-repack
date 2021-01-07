@@ -322,7 +322,7 @@ namespace ILRepacking
             _lineIndexer = new IKVMLineIndexer(this, Options.LineIndexation);
             var signingStep = new SigningStep(this, Options);
             var isUnixEnvironment = Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix;
-
+            var isMonoRuntime = Type.GetType("Mono.Runtime") != null;
             using (var sourceServerDataStep = GetSourceServerDataStep(isUnixEnvironment))
             {
                 List<IRepackStep> repackSteps = new List<IRepackStep>
@@ -373,7 +373,7 @@ namespace ILRepacking
 
                 // If this is an executable and we are on linux/osx we should copy file permissions from
                 // the primary assembly
-                if (isUnixEnvironment)
+                if (isUnixEnvironment && isMonoRuntime)
                 {
                     Stat stat;
                     Logger.Info("Copying permissions from " + PrimaryAssemblyFile);
