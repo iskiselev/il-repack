@@ -41,90 +41,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Application.cs" />
-    <Compile Include="CommandLine.cs" />
-    <Compile Include="ConfigMerger.cs" />
-    <Compile Include="DocumentationMerger.cs" />
-    <Compile Include="FileWrapper.cs" />
-    <Compile Include="ICommandLine.cs" />
-    <Compile Include="IFile.cs" />
-    <Compile Include="IRepackContext.cs" />
-    <Compile Include="IKVMLineIndexer.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="IRepackCopier.cs" />
-    <Compile Include="IRepackImporter.cs" />
-    <Compile Include="LineNumberWriter.cs" />
-    <Compile Include="MappingHandler.cs" />
-    <Compile Include="ILRepack.cs" />
-    <Compile Include="MethodMatcher.cs" />
-    <Compile Include="Mixins\AssemblyNameReferenceCollectionMixins.cs" />
-    <Compile Include="Mixins\CollectionMixins.cs" />
-    <Compile Include="PermissionsetHelper.cs" />
-    <Compile Include="PlatformFixer.cs" />
-    <Compile Include="Ports\CryptoService.cs" />
-    <Compile Include="Ports\CryptoConvert.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReferenceFixator.cs" />
-    <Compile Include="ReflectionHelper.cs" />
-    <Compile Include="RepackImporter.cs" />
-    <Compile Include="RepackLogger.cs" />
-    <Compile Include="RepackOptions.cs" />
-    <Compile Include="RepackAssemblyResolver.cs" />
-    <Compile Include="ResReader.cs" />
-    <Compile Include="SerReader.cs" />
-    <Compile Include="Steps\AttributesRepackStep.cs" />
-    <Compile Include="Steps\IRepackStep.cs" />
-    <Compile Include="Steps\ReferencesFixStep.cs" />
-    <Compile Include="Steps\ReferencesRepackStep.cs" />
-    <Compile Include="Steps\ResourceProcessing\BamlGenerator.cs" />
-    <Compile Include="Steps\ResourceProcessing\BamlResourcePatcher.cs" />
-    <Compile Include="Steps\ResourceProcessing\BamlStreamCollector.cs" />
-    <Compile Include="Steps\ResourceProcessing\BamlUtils.cs" />
-    <Compile Include="Steps\ResourceProcessing\GenericResourceProcessor.cs" />
-    <Compile Include="Steps\ResourceProcessing\IEmbeddedResourceProcessor.cs" />
-    <Compile Include="Steps\ResourceProcessing\IResProcessor.cs" />
-    <Compile Include="Steps\ResourcesRepackStep.cs" />
-    <Compile Include="Steps\ResourceProcessing\StringResourceProcessor.cs" />
-    <Compile Include="Steps\SigningStep.cs" />
-    <Compile Include="Steps\SourceServerData\HttpSourceServerDescriptor.cs" />
-    <Compile Include="Steps\SourceServerData\PdbStr.cs" />
-    <Compile Include="Steps\SourceServerData\SourceFileDescriptor.cs" />
-    <Compile Include="Steps\SourceServerData\SourceServerDataRepackStep.cs" />
-    <Compile Include="Steps\SourceServerData\StringMixins.cs" />
-    <Compile Include="Steps\TypesRepackStep.cs" />
-    <Compile Include="Steps\XamlResourcePathPatcherStep.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
     <None Include="ILRepack.snk" />
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +57,4 @@
   <ItemGroup>
     <EmbeddedResource Include="$(PkgSourceLink)\tools\pdbstr.exe" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -433,17 +433,8 @@ namespace ILRepacking
 
             if (meth.DebugInformation.Scope != null)
             {
-                nm.DebugInformation.Scope = new ScopeDebugInformation(
-                    nm.Body.Instructions.First(i => i.Offset == meth.DebugInformation.Scope.Start.Offset),
-                    meth.DebugInformation.Scope.End.IsEndOfMethod ? null : nm.Body.Instructions.First(i => i.Offset == meth.DebugInformation.Scope.End.Offset));
-                if (meth.DebugInformation.Scope.HasScopes)
-                    nm.DebugInformation.Scope.Scopes.AddRange(meth.DebugInformation.Scope.Scopes);
-                if (meth.DebugInformation.Scope.HasConstants)
-                    nm.DebugInformation.Scope.Constants.AddRange(meth.DebugInformation.Scope.Constants);
-                if (meth.DebugInformation.Scope.HasVariables)
-                    nm.DebugInformation.Scope.Variables.AddRange(meth.DebugInformation.Scope.Variables);
+                nm.DebugInformation.Scope = Clone(meth.DebugInformation.Scope, nm);
             }
-
 
             meth.Body = null; // frees memory
 
@@ -453,6 +444,100 @@ namespace ILRepacking
             nm.IsSetter = meth.IsSetter;
             nm.CallingConvention = meth.CallingConvention;
         }
+
+        private ScopeDebugInformation Clone(ScopeDebugInformation scope, MethodDefinition context)
+        {
+            var scopeDebugInfo  = new ScopeDebugInformation(
+                context.Body.Instructions.First(i => i.Offset == scope.Start.Offset),
+                scope.End.IsEndOfMethod ? null : context.Body.Instructions.First(i => i.Offset == scope.End.Offset));
+
+            if (scope.HasCustomDebugInformations)
+                scopeDebugInfo.CustomDebugInformations.AddRange(scope.CustomDebugInformations);
+
+            if (scope.HasScopes)
+            {
+                foreach (var innerScope in scopeDebugInfo.Scopes)
+                {
+                    scopeDebugInfo.Scopes.Add(Clone(innerScope, context));
+                }
+            }
+
+            if (scope.Import != null)
+            {
+                scopeDebugInfo.Import = Clone(scope.Import, context);
+            }
+
+            if (scope.HasVariables)
+                scopeDebugInfo.Variables.AddRange(scope.Variables);
+
+            if (scope.HasConstants)
+            {
+                foreach (var constantDebugInformation in scope.Constants)
+                {
+                    var di = new ConstantDebugInformation(constantDebugInformation.Name,
+                        Import(constantDebugInformation.ConstantType, context), constantDebugInformation.Value);
+                    if (constantDebugInformation.HasCustomDebugInformations)
+                        di.CustomDebugInformations.AddRange(constantDebugInformation.CustomDebugInformations);
+
+                    scopeDebugInfo.Constants.Add(di);
+                }
+            }
+
+            return scopeDebugInfo;
+        }
+
+        private ImportDebugInformation Clone(ImportDebugInformation import, MethodDefinition context)
+        {
+            var importDebugInfo = new ImportDebugInformation();
+
+            if (import.HasCustomDebugInformations)
+                importDebugInfo.CustomDebugInformations.AddRange(import.CustomDebugInformations);
+
+            if (import.Parent != null)
+            {
+                importDebugInfo.Parent = Clone(import.Parent, context);
+            }
+
+            if (import.HasTargets)
+            {
+                foreach (var importTarget in import.Targets)
+                {
+                    var targetCopy = new ImportTarget(importTarget.Kind);
+                    if (importTarget.Alias != null)
+                    {
+                        targetCopy.Alias = importTarget.Alias;
+                    }
+                    if (importTarget.Namespace != null)
+                    {
+                        targetCopy.Namespace = importTarget.Namespace;
+                    }
+
+                    if (importTarget.AssemblyReference != null)
+                    {
+                        if (_repackContext.MergedAssemblies.Any(x => x.Name.Name == importTarget.AssemblyReference.Name))
+                        {
+                            continue;
+                        }
+                        targetCopy.AssemblyReference = (AssemblyNameReference)_repackContext.PlatformFixer.FixPlatformVersion(importTarget.AssemblyReference);
+                    }
+                    if (importTarget.AssemblyReference != null)
+                    {
+                        targetCopy.AssemblyReference = targetCopy.AssemblyReference;
+                    }
+
+                    if (importTarget.Type != null)
+                    {
+                        targetCopy.Type = Import(importTarget.Type, context);
+                    }
+
+                    importDebugInfo.Targets.Add(targetCopy);
+                }
+            }
+
+            return importDebugInfo;
+        }
+
+
 
         private void CloneTo(MethodBody body, MethodDefinition parent)
         {
