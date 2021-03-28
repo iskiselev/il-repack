@@ -456,7 +456,7 @@ namespace ILRepacking
 
             if (scope.HasScopes)
             {
-                foreach (var innerScope in scopeDebugInfo.Scopes)
+                foreach (var innerScope in scope.Scopes)
                 {
                     scopeDebugInfo.Scopes.Add(Clone(innerScope, context));
                 }
@@ -644,6 +644,7 @@ namespace ILRepacking
                         default:
                             throw new InvalidOperationException();
                     }
+                ni.Offset = instr.Offset;
                 nb.Instructions.Add(ni);
             }
             for (int i = 0; i < body.Instructions.Count; i++)
