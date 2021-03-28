@@ -387,6 +387,7 @@ namespace ILRepacking
             // use void placeholder as we'll do the return type import later on (after generic parameters)
             MethodDefinition nm = new MethodDefinition(meth.Name, meth.Attributes, _repackContext.TargetAssemblyMainModule.TypeSystem.Void);
             nm.ImplAttributes = meth.ImplAttributes;
+            
             if (meth.DebugInformation.HasCustomDebugInformations)
                 nm.DebugInformation.CustomDebugInformations.AddRange(meth.DebugInformation.CustomDebugInformations);
             if (meth.DebugInformation.HasSequencePoints)
@@ -429,6 +430,21 @@ namespace ILRepacking
 
             if (meth.HasBody)
                 CloneTo(meth.Body, nm);
+
+            if (meth.DebugInformation.Scope != null)
+            {
+                nm.DebugInformation.Scope = new ScopeDebugInformation(
+                    nm.Body.Instructions.First(i => i.Offset == meth.DebugInformation.Scope.Start.Offset),
+                    meth.DebugInformation.Scope.End.IsEndOfMethod ? null : nm.Body.Instructions.First(i => i.Offset == meth.DebugInformation.Scope.End.Offset));
+                if (meth.DebugInformation.Scope.HasScopes)
+                    nm.DebugInformation.Scope.Scopes.AddRange(meth.DebugInformation.Scope.Scopes);
+                if (meth.DebugInformation.Scope.HasConstants)
+                    nm.DebugInformation.Scope.Constants.AddRange(meth.DebugInformation.Scope.Constants);
+                if (meth.DebugInformation.Scope.HasVariables)
+                    nm.DebugInformation.Scope.Variables.AddRange(meth.DebugInformation.Scope.Variables);
+            }
+
+
             meth.Body = null; // frees memory
 
             nm.IsAddOn = meth.IsAddOn;
