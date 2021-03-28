@@ -262,14 +262,17 @@ namespace ILRepacking
             Options.Validate();
             PrintRepackHeader();
 
-            var actualOutFile = Options.OutputFile;
-            Options.OutputFile = GetTempFile(Options.OutputFile);
+            var actualOutFile = Path.GetFullPath(Options.OutputFile);
+            Options.OutputFile = actualOutFile;
 
             _reflectionHelper = new ReflectionHelper(this);
             ResolveSearchDirectories();
 
             // Read input assemblies only after all properties are set.
             ReadInputAssemblies();
+
+            if (MergedAssemblyFiles.Any(m=> string.Compare(m, actualOutFile, StringComparison.OrdinalIgnoreCase) == 0))
+                Options.OutputFile = GetTempFile(Options.OutputFile);
 
             _platformFixer = new PlatformFixer(this, PrimaryAssemblyMainModule.Runtime);
             _mappingHandler = new MappingHandler();
@@ -369,8 +372,11 @@ namespace ILRepacking
                 TargetAssemblyDefinition.Dispose();
                 GlobalAssemblyResolver.Dispose();
 
-                MoveTempFile(Options.OutputFile, actualOutFile);
-                Options.OutputFile = actualOutFile;
+                if (Options.OutputFile != actualOutFile)
+                {
+                    MoveTempFile(Options.OutputFile, actualOutFile);
+                    Options.OutputFile = actualOutFile;
+                }
 
                 // If this is an executable and we are on linux/osx we should copy file permissions from
                 // the primary assembly
