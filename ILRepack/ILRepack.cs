@@ -291,7 +291,9 @@ namespace ILRepacking
             TargetRuntime runtime = ParseTargetPlatform();
 
             // change assembly's name to correspond to the file we create
-            string mainModuleName = Path.GetFileNameWithoutExtension(Options.OutputFile);
+            string mainModuleName = Options.UsePrimaryAssemblyName 
+                ? PrimaryAssemblyDefinition.Name.Name
+                : Path.GetFileNameWithoutExtension(Options.OutputFile);
 
             if (TargetAssemblyDefinition == null)
             {

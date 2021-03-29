@@ -27,6 +27,7 @@ namespace ILRepacking
         public bool CopyAttributes { get; set; }
         public bool DebugInfo { get; set; }
         public bool DelaySign { get; set; }
+        public bool UsePrimaryAssemblyName { get; set; }
 
         /// <summary>
         /// Gets or sets a file that contains one regex per line to compare against 
@@ -159,6 +160,7 @@ namespace ILRepacking
             CopyAttributes = cmd.Modifier("copyattrs");
             DebugInfo = !cmd.Modifier("ndebug");
             DelaySign = cmd.Modifier("delaysign");
+            UsePrimaryAssemblyName = cmd.Modifier("useprimaryassemblyname");
             cmd.Option("align"); // not supported, just prevent interpreting this as file...
             Internalize = cmd.HasOption("internalize");
             if (Internalize)
